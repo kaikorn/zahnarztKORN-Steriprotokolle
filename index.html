@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>zahnarztKORN</title>
-<style> 
+<style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:system-ui,sans-serif}
 body{background:#F4F1EC;min-height:100vh}
 .hdr{background:#2D5A3D;padding:13px 16px;display:flex;justify-content:space-between;align-items:center}
@@ -63,9 +63,9 @@ canvas{width:100%;height:90px;border:1.5px solid #ddd;border-radius:8px;backgrou
   </div>
   <div style="background:#fff;border-radius:16px;padding:28px 28px;width:100%;max-width:300px">
     <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;text-align:center">PIN eingeben</div>
-    <input id="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••"
-      style="width:100%;padding:14px;border:2px solid #ddd;border-radius:10px;font-size:24px;text-align:center;letter-spacing:8px;outline:none;box-sizing:border-box;font-family:monospace"
-      oninput="checkPin(this.value)" autofocus>
+    <input id="pin-input" type="tel" maxlength="4" placeholder="0000"
+      style="width:100%;padding:14px;border:2px solid #ddd;border-radius:10px;font-size:28px;text-align:center;letter-spacing:6px;outline:none;box-sizing:border-box;font-family:monospace"
+      oninput="checkPin(this.value)" autocomplete="off">
     <div id="pin-error" style="color:#c0392b;font-size:12px;text-align:center;margin-top:8px;min-height:18px"></div>
   </div>
 </div>
@@ -311,10 +311,11 @@ function openPrintTab(){
 }
 
 function checkPin(val) {
-  if(val.length === 4) {
-    if(val === '8820') {
+  var clean = val.replace(/\D/g, '');
+  document.getElementById('pin-input').value = clean;
+  if(clean.length === 4) {
+    if(clean === '8820') {
       document.getElementById('pin-screen').style.display = 'none';
-      
     } else {
       document.getElementById('pin-error').textContent = 'Falscher PIN. Bitte erneut versuchen.';
       document.getElementById('pin-input').value = '';
