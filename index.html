@@ -73,10 +73,10 @@ canvas{width:100%;height:90px;border:1.5px solid #ddd;border-radius:8px;backgrou
 <input type="file" accept="image/*" capture="environment" id="cam-input" style="display:none">
 <script>
 var G='#2D5A3D',BR='#7A5C3D',PU='#6B4A9E',OR='#C06A1A';
-var TL={siegelgeraet:'Siegelgerät',raumtemperatur:'Raumtemperatur',sterilisator:'SteriEuronda E10',reinigung:'Reinigung Fussboden',pflegegeraet:'Pflegegerät Assistina',reinigung_sterilisator:'Reinigungs-Sterilisator Lisa',melatherm:'Reinigung MELAtherm',ablaufdaten:'Ablaufdaten & Sauberkeit',datensicherung:'Datensicherung',buerste:'Austausch Bürste/Handschuhe',sympronadeln:'Sympronadeln austauschen',kanister:'Rückverfolgbarkeit Kanister',ultraschall:'Federhafte Waschgänge MedaTERM'};
+var TL={siegelgeraet:'Siegelgerät',raumtemperatur:'Raumtemperatur',sterilisator:'Sterilisator Lisa',reinigung:'Reinigung Fussboden',pflegegeraet:'Pflegegerät Assistina',reinigung_sterilisator:'Reinigungs-Sterilisator Lisa',melatherm:'Reinigung MELAtherm',ablaufdaten:'Ablaufdaten & Sauberkeit',datensicherung:'Datensicherung',buerste:'Austausch Bürste/Handschuhe',sympronadeln:'Sympronadeln austauschen',kanister:'Rückverfolgbarkeit Kanister',ultraschall:'Ultraschall Waschcheck'};
 var TC={siegelgeraet:G,raumtemperatur:G,sterilisator:G,reinigung:G,pflegegeraet:BR,reinigung_sterilisator:BR,melatherm:BR,ablaufdaten:BR,datensicherung:BR,buerste:PU,sympronadeln:PU,kanister:OR,ultraschall:OR};
-var SN={siegelgeraet:{name:'Eurosel 2001 Plus',sn:'SN GDH201720'},sterilisator:{name:'Euronda E10',sn:'EXM240031-27.1.2025'},reinigung_sterilisator:{name:'Euronda E10',sn:'EXM240031-27.1.2025'},pflegegeraet:{name:'W&H Assistina 3x3',sn:'SN07159'},melatherm:{name:'Melag MELAtherm 10',sn:'SN 202110-DTA1067'},ultraschall:{name:'SONICA',sn:'SN 2021016821'}};
-var KM={date:'Datum',time:'Uhrzeit',geraet_sn:'Geräte-SN',status:'Status',art:'Art',ort:'Ort',ist:'Ist °C',min:'Min °C',max:'Max °C',bemerkung:'Bemerkung',massnahme:'Massnahme',warum:'Warum',programm:'Programm',chargennr:'Chargennummer',c1:'Programm abgelaufen',c2:'Keine Fehlermeldung',c3:'Entleert/gereinigt',c4:'Protokollstreifen',erledigt:'Erledigt',done:'Durchgeführt',innen:'Innen gereinigt',innen_aussen:'Innen & Aussen',tank:'Tank gereinigt',aussen:'Aussen gereinigt',siebe:'Siebe/Arme gereinigt',lager:'Lager',apotheke:'Apotheke',notfall:'Notfallkoffer',instrumente:'Instrumente',produkt:'Produktname',verfall:'Verfallsdatum',oeffnung:'Öffnungsdatum',josafe:'Josafe nicht gewaschen',fehler:'Fehlermeldung/Störung',techniker:'Techniker kontaktiert',programm_frei:'Programm (frei)',lernende:'Freigabe Lernende'};
+var SN={siegelgeraet:{name:'Eurosel 2001 Plus',sn:'SN GDH201720'},sterilisator:{name:'W&H Lisa 517',sn:'SN13001'},reinigung_sterilisator:{name:'W&H Lisa 517',sn:'SN13001'},pflegegeraet:{name:'W&H Assistina 3x3',sn:'SN07159'},melatherm:{name:'Melag MELAtherm 10',sn:'SN 202110-DTA1067'},ultraschall:{name:'SONICA',sn:'SN 2021016821'}};
+var KM={date:'Datum',time:'Uhrzeit',geraet_sn:'Geräte-SN',status:'Status',art:'Art',ort:'Ort',ist:'Ist °C',min:'Min °C',max:'Max °C',bemerkung:'Bemerkung',massnahme:'Massnahme',warum:'Warum',programm:'Programm',chargennr:'Chargennummer',c1:'Programm abgelaufen',c2:'Keine Fehlermeldung',c3:'Entleert/gereinigt',c4:'Protokollstreifen',erledigt:'Erledigt',done:'Durchgeführt',innen:'Innen gereinigt',innen_aussen:'Innen & Aussen',tank:'Tank gereinigt',aussen:'Aussen gereinigt',siebe:'Siebe/Arme gereinigt',lager:'Lager',apotheke:'Apotheke',notfall:'Notfallkoffer',instrumente:'Instrumente',produkt:'Produktname',verfall:'Verfallsdatum',oeffnung:'Öffnungsdatum',josafe:'Josafe nicht gewaschen',fehler:'Fehlermeldung/Störung',techniker:'Techniker kontaktiert',programm_frei:'Programm (frei)'};
 var STORE_KEY='korn_zahnarzt_v1';
 var state={view:'dash',entries:[],form:null,fd:{},sig:null,sel:{},archFilter:'all',printEntries:null};
 var sigCanvas,sigCtx,drawing=false;
@@ -86,7 +86,7 @@ function nowTime(){return new Date().toTimeString().slice(0,5);}
 function fmtD(s){if(!s)return'';var p=s.split('-');return p[2]+'.'+p[1]+'.'+p[0];}
 function makeFilename(e){var d=e.data&&e.data.date||today();var n=(TL[e.type]||e.type).replace(/\s+/g,'-').replace(/[&\/\\#,+()$~%'"]/g,'');return d+'_'+n;}
 function countFor(t){return state.entries.filter(function(e){return e.type===t;}).length;}
-function getFiltered(){if(state.archFilter==='sterilisator_standard')return state.entries.filter(function(e){return e.type==='sterilisator'&&!e.data.lernende;});if(state.archFilter==='sterilisator_lernende')return state.entries.filter(function(e){return e.type==='sterilisator'&&!!e.data.lernende;});if(state.archFilter==='all')return state.entries;return state.entries.filter(function(e){return e.type===state.archFilter;});}
+function getFiltered(){return state.archFilter==='all'?state.entries:state.entries.filter(function(e){return e.type===state.archFilter;});}
 function loadData(){try{var s=localStorage.getItem(STORE_KEY);state.entries=s?JSON.parse(s):[];}catch(e){state.entries=[];}render();}
 function saveData(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state.entries));}catch(e){console.error('Storage error',e);}}
 
@@ -98,10 +98,10 @@ function render(){
 }
 
 function renderDash(){
-  var daily=[{k:'siegelgeraet',i:'🔐',t:'Siegelgerät',s:'Seal Check | SN GDH201720'},{k:'raumtemperatur',i:'🌡️',t:'Raumtemperatur',s:'Apotheke / OP 2'},{k:'sterilisator',i:'⚗️',t:'SteriEuronda E10',s:'Zykluskontrolle | EXM240031'},{k:'reinigung',i:'🧹',t:'Reinigung Fussboden',s:'Gesamte Praxis'}];
+  var daily=[{k:'siegelgeraet',i:'🔐',t:'Siegelgerät',s:'Seal Check | SN GDH201720'},{k:'raumtemperatur',i:'🌡️',t:'Raumtemperatur',s:'Apotheke / OP 2'},{k:'sterilisator',i:'⚗️',t:'Sterilisator Lisa',s:'Zykluskontrolle | SN13001'},{k:'reinigung',i:'🧹',t:'Reinigung Fussboden',s:'Gesamte Praxis'}];
   var weekly=[{k:'pflegegeraet',i:'🦷',t:'Pflegegerät Assistina',s:'W&H Assistina | SN07159'},{k:'reinigung_sterilisator',i:'🔧',t:'Reinigungs-Sterilisator Lisa',s:'Wöchentlich | SN13001'},{k:'melatherm',i:'💧',t:'Reinigung MELAtherm',s:'SN 202110-DTA1067'},{k:'ablaufdaten',i:'📦',t:'Ablaufdaten & Sauberkeit',s:'4-Bereiche Kontrolle'},{k:'datensicherung',i:'💾',t:'Datensicherung',s:'Wöchentlich'}];
   var quarterly=[{k:'buerste',i:'🧤',t:'Austausch Bürste/Handschuhe',s:'Alle 3 Monate'},{k:'sympronadeln',i:'💉',t:'Sympronadeln austauschen',s:'Alle 3 Monate'}];
-  var bedarf=[{k:'kanister',i:'🗂️',t:'Rückverfolgbarkeit Kanister',s:'Bei Bedarf'},{k:'ultraschall',i:'🔊',t:'Federhafte Waschgänge MedaTERM',s:'Bei Bedarf | SN 2021016821'}];
+  var bedarf=[{k:'kanister',i:'🗂️',t:'Rückverfolgbarkeit Kanister',s:'Bei Bedarf'},{k:'ultraschall',i:'🔊',t:'Ultraschall Waschcheck',s:'Bei Bedarf | SN 2021016821'}];
   function sec(lbl,col,items){
     return '<div class="sec-hd"><div class="sec-dot" style="background:'+col+'"></div><span class="sec-txt" style="color:'+col+'">'+lbl+'</span><div class="sec-line"></div></div>'+
       '<div class="grid">'+items.map(function(p){var c=countFor(p.k);var bc=TC[p.k]||G;return'<button class="tile" onclick="openForm(\''+p.k+'\')" style="border-color:'+bc+'"><span class="tile-icon">'+p.i+'</span><div class="tile-title">'+p.t+'</div><div class="tile-sub">'+p.s+'</div>'+(c>0?'<div class="badge" style="background:'+bc+'">'+c+'</div>':'')+' </button>';}).join('')+'</div>';
@@ -112,20 +112,6 @@ function renderDash(){
     '<p style="text-align:center;margin-top:24px;font-size:10px;color:#ccc">Daten werden lokal auf diesem Gerät gespeichert</p></div>';
 }
 
-
-function makeLernendeBox(fd) {
-  var isOn = !!fd.lernende;
-  var archiv = isOn ? 'SteriEuronda > Freigaben Lernende' : 'SteriEuronda > Standard Freigaben';
-  var check = isOn ? '<svg width="11" height="11" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>' : '';
-  var boxStyle = 'margin-top:13px;background:#fff8e1;border:1.5px solid #f0c040;border-radius:8px;padding:10px 13px;cursor:pointer;display:flex;align-items:center;gap:9px';
-  var cbbStyle = 'width:22px;height:22px;border-radius:5px;border:2px solid ' + (isOn ? '#f0c040;background:#f0c040' : '#ccc;background:#fff') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0';
-  return '<div style="' + boxStyle + '" onclick="tfd('lernende')">' +
-    '<div style="' + cbbStyle + '">' + check + '</div>' +
-    '<div>' +
-      '<div style="font-size:13px;color:#1a1a1a;font-weight:600">Freigabe durch Lernende</div>' +
-      '<div style="font-size:10px;color:#b7860b;margin-top:2px">Archiv: ' + archiv + '</div>' +
-    '</div></div>';
-}
 function renderForm(){
   var t=state.form,fd=state.fd,col=TC[t]||G;
   var sni=SN[t];
@@ -141,7 +127,7 @@ function renderForm(){
   var body='';
   if(t==='siegelgeraet')body=DT+snBar+'<lbl>Seal Check Status</lbl>'+pills('status',['OK','Nicht OK'])+(fd.status==='Nicht OK'?'<lbl>Bemerkung / Massnahme</lbl>'+txta('bemerkung','Beschreibung...'):'');
   else if(t==='raumtemperatur')body=DT+'<lbl>Ort</lbl>'+sel('ort',['Apotheke','OP 2'])+'<div class="g2"><div><lbl>Ist °C</lbl>'+inp('ist','number','21.5')+'</div><div><lbl>Min °C</lbl>'+inp('min','number')+'</div></div><div style="max-width:50%"><lbl>Max °C</lbl>'+inp('max','number')+'</div>';
-  else if(t==='sterilisator')body=DT+snBar+'<lbl>Programm</lbl>'+pills('art',['134B Prion','Schnellprogramm S134','Helix Vakuum'])+'<lbl>Status</lbl>'+pills('status',['Erfolgreich','Fehlgeschlagen','Abgebrochen'])+(fd.status==='Fehlgeschlagen'?'<div class="warn-box"><lbl>Warum</lbl>'+txta('warum','Grund...')+'<lbl>Massnahme</lbl>'+txta('massnahme','Massnahme...')+'</div>':'')+'<lbl>Foto Protokollstreifen</lbl>'+camBtn()+makeLernendeBox(fd);
+  else if(t==='sterilisator')body=DT+snBar+'<lbl>Art</lbl>'+pills('art',['134B PRION','Universal','Helix-Vakuum'])+'<lbl>Status</lbl>'+pills('status',['Erfolgreich','Fehlgeschlagen','Abgebrochen'])+(fd.status==='Fehlgeschlagen'?'<div class="warn-box"><lbl>Warum</lbl>'+txta('warum','Grund...')+'<lbl>Massnahme</lbl>'+txta('massnahme','Massnahme...')+'</div>':'')+'<lbl>Foto Protokollstreifen</lbl>'+camBtn();
   else if(t==='reinigung')body=DT+cw(chk('erledigt','Reinigung & Desinfektion Fussboden gesamte Praxis erledigt'));
   else if(t==='pflegegeraet')body=DT+snBar+cw(chk('done','Reinigung Assistina durchgeführt'))+'<lbl>Bemerkungen</lbl>'+txta('bemerkung','Besonderheiten...');
   else if(t==='reinigung_sterilisator')body=DT+snBar+cw(chk('done','Reinigung Sterilisator Lisa durchgeführt'))+'<lbl>Bemerkungen</lbl>'+txta('bemerkung','Besonderheiten...');
@@ -198,7 +184,7 @@ function renderArchive(){
   var months={};
   filtered.forEach(function(e){var m=(e.data&&e.data.date||'').slice(0,7)||'—';months[m]=(months[m]||0)+1;});
   var mInfo=Object.keys(months).sort().reverse().map(function(m){var p=m.split('-');return(p[1]&&p[0]?p[1]+'.'+p[0]:m)+': '+months[m];}).join('  ·  ');
-  var opts='<option value="all">Alle Protokolle</option>'+Object.keys(TL).map(function(k){return'<option value="'+k+'"'+(state.archFilter===k?' selected':'')+'>'+TL[k]+'</option>';}).join('')+'<option value="sterilisator_standard"'+(state.archFilter==="sterilisator_standard"?' selected':'')+'>SteriEuronda – Standard Freigaben</option><option value="sterilisator_lernende"'+(state.archFilter==="sterilisator_lernende"?' selected':'')+'>SteriEuronda – Freigaben Lernende</option>';
+  var opts='<option value="all">Alle Protokolle</option>'+Object.keys(TL).map(function(k){return'<option value="'+k+'"'+(state.archFilter===k?' selected':'')+'>'+TL[k]+'</option>';}).join('');
   var rows=filtered.length===0?'<div class="empty">Noch keine Einträge.</div>':filtered.map(function(e){
     var bc=TC[e.type]||G;var isSel=!!state.sel[e.id];var fname=makeFilename(e);
     return'<div class="arc-row" style="border-color:'+bc+';'+(isSel?'background:#e8f0eb;':'')+'">'+
@@ -207,7 +193,7 @@ function renderArchive(){
       '</div>'+
       (e.sig?'<img src="'+e.sig+'" style="height:42px;width:68px;object-fit:contain;border-radius:5px;border:1px solid #ddd;flex-shrink:0">':'')+
       '<div style="flex:1;min-width:0;overflow:hidden">'+
-        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:'+bc+'">'+(TL[e.type]||e.type)+(e.type==="sterilisator"?(e.data&&e.data.lernende?' [LERNENDE]':' [STANDARD]'):'')+'</div>'+
+        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:'+bc+'">'+(TL[e.type]||e.type)+'</div>'+
         '<div style="font-size:11px;color:#888;margin-top:1px">'+fmtD(e.data&&e.data.date)+' · '+(e.data&&e.data.time||'')+'</div>'+
         '<div style="font-size:9px;color:#ccc;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+fname+'</div>'+
       '</div>'+
@@ -314,7 +300,7 @@ function checkPin(val) {
   if(val.length === 4) {
     if(val === '8820') {
       document.getElementById('pin-screen').style.display = 'none';
-      
+      sessionStorage.setItem('korn_auth', '1');
     } else {
       document.getElementById('pin-error').textContent = 'Falscher PIN. Bitte erneut versuchen.';
       document.getElementById('pin-input').value = '';
@@ -322,7 +308,12 @@ function checkPin(val) {
     }
   }
 }
-
+function checkAuth() {
+  if(sessionStorage.getItem('korn_auth') === '1') {
+    document.getElementById('pin-screen').style.display = 'none';
+  }
+}
+checkAuth();
 
 loadData();
 </script>
