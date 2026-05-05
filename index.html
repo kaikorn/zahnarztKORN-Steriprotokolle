@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zahnarztKORN</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:system-ui,sans-serif}
+body{background:#F4F1EC;min-height:100vh}
+#pin-screen{position:fixed;inset:0;background:#2D5A3D;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:30px}
+.hdr{background:#2D5A3D;padding:13px 16px;display:flex;justify-content:space-between;align-items:center}
+.hdr-title{color:#fff;font-size:17px;font-weight:600}
+.hdr-sub{color:rgba(255,255,255,.6);font-size:11px;margin-top:2px}
+.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;color:#fff;font-size:13px;cursor:pointer}
+.pad{padding:13px}
+.sec-hd{display:flex;align-items:center;gap:8px;margin:14px 0 9px}
+.sec-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sec-txt{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.sec-line{flex:1;height:1px;background:#ddd}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:4px}
+.tile{background:#fff;border-radius:11px;padding:13px 11px;border:2px solid #2D5A3D;cursor:pointer;text-align:left;position:relative;min-height:82px;width:100%;display:block}
+.tile:active{opacity:.65}
+.tile-icon{font-size:20px;display:block;margin-bottom:4px}
+.tile-title{font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:1px;line-height:1.3}
+.tile-sub{font-size:10px;color:#888;line-height:1.3}
+.badge{position:absolute;top:7px;right:7px;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:700;color:#fff}
+.lbl{display:block;font-size:10px;font-weight:700;color:#666;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.fi{width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;background:#fff;color:#1a1a1a;outline:none;margin-bottom:11px;box-sizing:border-box}
+.fi:focus{border-color:#2D5A3D}
+textarea.fi{resize:vertical;min-height:65px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px}
+.pill{padding:6px 12px;border-radius:20px;font-size:12px;border:1.5px solid #ddd;cursor:pointer;background:#fff;color:#888}
+.pill.on{background:#2D5A3D;border-color:#2D5A3D;color:#fff}
+.chk-wrap{background:#fff;border-radius:9px;padding:7px 13px;border:1.5px solid #ddd;margin-bottom:11px}
+.cbr{display:flex;align-items:center;gap:9px;padding:8px 0;cursor:pointer;border-bottom:1px solid #f0ede8}
+.cbr:last-child{border-bottom:none}
+.cbb{width:22px;height:22px;border-radius:5px;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
+.cbb.on{background:#2D5A3D;border-color:#2D5A3D}
+canvas{width:100%;height:90px;border:1.5px solid #ddd;border-radius:8px;background:#fafaf8;cursor:crosshair;touch-action:none;display:block}
+.save-btn{width:100%;padding:12px;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;margin-top:13px;background:#2D5A3D}
+.save-btn.br{background:#7A5C3D}.save-btn.pu{background:#6B4A9E}.save-btn.or{background:#C06A1A}.save-btn.ok{background:#27ae60}
+.arc-row{background:#fff;border-radius:9px;padding:11px 13px;margin-bottom:7px;display:flex;gap:9px;align-items:center;border:1.5px solid #2D5A3D}
+.sn-bar{background:#f0f0ee;border-radius:7px;padding:7px 11px;margin-bottom:11px;font-size:11px;color:#666;font-family:monospace}
+.warn-box{background:#fff8e1;border:1.5px solid #f0c040;border-radius:8px;padding:9px 13px;margin-bottom:11px}
+.lernende-box{background:#fff8e1;border:1.5px solid #f0c040;border-radius:8px;padding:10px 13px;margin-top:13px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.cam-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;background:#fff;border:1.5px dashed #aaa;border-radius:8px;font-size:13px;color:#555;cursor:pointer;margin-bottom:9px}
+.empty{text-align:center;padding:36px;color:#aaa;font-size:13px}
+.prt-hdr{background:#2D5A3D;padding:11px 14px;display:flex;gap:9px;align-items:center}
+.prt-hdr span{color:#fff;font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prt-btn{padding:7px 13px;border-radius:7px;border:none;font-size:12px;font-weight:600;cursor:pointer}
+.sel-bar{background:#e8f0eb;border-radius:9px;padding:9px 13px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #2D5A3D}
+@media print{.prt-hdr{display:none!important}button{display:none!important}}
+</style>
+</head>
+<body>
+
+<div id="pin-screen">
+  <div style="text-align:center;margin-bottom:36px">
+    <div style="font-size:26px;font-weight:700;color:#fff">zahnarztKORN</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:5px">Protokollführung</div>
+  </div>
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:300px">
+    <div style="font-size:11px;font-weight:700;color:#666;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;text-align:center">PIN eingeben</div>
+    <input id="pin-input" type="tel" maxlength="4" placeholder="0000"
+      style="width:100%;padding:14px;border:2px solid #ddd;border-radius:10px;font-size:28px;text-align:center;letter-spacing:6px;outline:none;box-sizing:border-box;font-family:monospace;margin-bottom:12px"
+      autocomplete="off">
+    <button id="pin-btn" style="width:100%;padding:13px;background:#2D5A3D;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit">
+      Bestätigen
+    </button>
+    <div id="pin-error" style="color:#c0392b;font-size:12px;text-align:center;margin-top:8px;min-height:18px"></div>
+  </div>
+</div>
+
+<div id="app"></div>
+<input type="file" accept="image/*" capture="environment" id="cam-input" style="display:none">
+
+<script>
+// ── PIN ──────────────────────────────────────────────────────────────────────
+document.getElementById('pin-btn').addEventListener('click', function() {
+  var val = document.getElementById('pin-input').value.trim();
+  if (val === '8820') {
+    document.getElementById('pin-screen').style.display = 'none';
+  } else {
+    document.getElementById('pin-error').textContent = 'Falscher PIN.';
+    document.getElementById('pin-input').value = '';
+    setTimeout(function(){ document.getElementById('pin-error').textContent = ''; }, 2000);
+  }
+});
+document.getElementById('pin-input').addEventListener('keyup', function(e) {
+  if (e.key === 'Enter') document.getElementById('pin-btn').click();
+  if (this.value.length === 4) document.getElementById('pin-btn').click();
+});
+
+// ── Data ─────────────────────────────────────────────────────────────────────
+var STORE = 'korn_zahnarzt_v2';
+var G='#2D5A3D', BR='#7A5C3D', PU='#6B4A9E', OR='#C06A1A';
+
+var TL = {
+  siegelgeraet:'Siegelgerät', raumtemperatur:'Raumtemperatur',
+  sterilisator:'SteriEuronda E10', reinigung:'Reinigung Fussboden',
+  pflegegeraet:'Pflegegerät Assistina', reinigung_sterilisator:'Reinigungs-Sterilisator Lisa',
+  melatherm:'Reinigung MELAtherm', ablaufdaten:'Ablaufdaten & Sauberkeit',
+  datensicherung:'Datensicherung', buerste:'Austausch Bürste/Handschuhe',
+  sympronadeln:'Sympronadeln austauschen', kanister:'Rückverfolgbarkeit Kanister',
+  ultraschall:'Fehlerhafte Waschgänge MELAtherm'
+};
+var TC = {
+  siegelgeraet:G, raumtemperatur:G, sterilisator:G, reinigung:G,
+  pflegegeraet:BR, reinigung_sterilisator:BR, melatherm:BR, ablaufdaten:BR, datensicherung:BR,
+  buerste:PU, sympronadeln:PU, kanister:OR, ultraschall:OR
+};
+var SN = {
+  siegelgeraet:{name:'Eurosel 2001 Plus', sn:'SN GDH201720'},
+  sterilisator:{name:'Euronda E10', sn:'EXM240031-27.1.2025'},
+  reinigung_sterilisator:{name:'W&H Lisa 517', sn:'SN13001'},
+  pflegegeraet:{name:'W&H Assistina 3x3', sn:'SN07159'},
+  melatherm:{name:'Melag MELAtherm 10', sn:'SN 202110-DTA1067'},
+  ultraschall:{name:'SONICA', sn:'SN 2021016821'}
+};
+var KM = {
+  date:'Datum', time:'Uhrzeit', geraet_sn:'Geräte-SN', status:'Status', art:'Programm',
+  ort:'Ort', ist:'Ist °C', min:'Min °C', max:'Max °C', bemerkung:'Bemerkung',
+  massnahme:'Massnahme', warum:'Warum', programm:'Programm', chargennr:'Chargennummer',
+  erledigt:'Erledigt', done:'Durchgeführt', lernende:'Freigabe Lernende',
+  innen:'Innen gereinigt', tank:'Tank gereinigt', aussen:'Aussen gereinigt',
+  siebe:'Siebe/Arme gereinigt', lager:'Lager', apotheke:'Apotheke',
+  notfall:'Notfallkoffer', instrumente:'Instrumente', produkt:'Produktname',
+  verfall:'Verfallsdatum', oeffnung:'Öffnungsdatum',
+  josafe:'Josafe nicht gewaschen', fehler:'Fehlermeldung/Störung',
+  techniker:'Techniker kontaktiert', programm_frei:'Programm (frei)'
+};
+
+var state = {
+  view:'dash', entries:[], form:null, fd:{}, sig:null,
+  sel:{}, archFilter:'all', printEntries:null
+};
+var sigCanvas, sigCtx, drawing = false;
+
+function today(){ return new Date().toISOString().split('T')[0]; }
+function nowTime(){ return new Date().toTimeString().slice(0,5); }
+function fmtD(s){ if(!s) return ''; var p=s.split('-'); return p[2]+'.'+p[1]+'.'+p[0]; }
+function makeFilename(e){ var d=e.data&&e.data.date||today(); var n=(TL[e.type]||e.type).replace(/\s+/g,'-').replace(/[&\/\\#,+()$~%'"]/g,''); return d+'_'+n; }
+function countFor(t){ return state.entries.filter(function(e){ return e.type===t; }).length; }
+function getFiltered(){
+  if(state.archFilter==='sterilisator_standard') return state.entries.filter(function(e){ return e.type==='sterilisator' && !e.data.lernende; });
+  if(state.archFilter==='sterilisator_lernende') return state.entries.filter(function(e){ return e.type==='sterilisator' && !!e.data.lernende; });
+  if(state.archFilter==='all') return state.entries;
+  return state.entries.filter(function(e){ return e.type===state.archFilter; });
+}
+function loadData(){ try{ var s=localStorage.getItem(STORE); state.entries=s?JSON.parse(s):[]; }catch(e){ state.entries=[]; } render(); }
+function saveData(){ try{ localStorage.setItem(STORE,JSON.stringify(state.entries)); }catch(e){} }
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render(){
+  if(state.printEntries){ renderPrint(); return; }
+  if(state.form){ renderForm(); return; }
+  if(state.view==='archive'){ renderArchive(); return; }
+  renderDash();
+}
+
+function makeTile(p){
+  var c=countFor(p.k), bc=TC[p.k]||G;
+  return '<button class="tile" onclick="openForm(\''+p.k+'\')" style="border-color:'+bc+'">'
+    +'<span class="tile-icon">'+p.i+'</span>'
+    +'<div class="tile-title">'+p.t+'</div>'
+    +'<div class="tile-sub">'+p.s+'</div>'
+    +(c>0?'<div class="badge" style="background:'+bc+'">'+c+'</div>':'')+
+    '</button>';
+}
+
+function makeSec(lbl,col,items){
+  return '<div class="sec-hd"><div class="sec-dot" style="background:'+col+'"></div>'
+    +'<span class="sec-txt" style="color:'+col+'">'+lbl+'</span>'
+    +'<div class="sec-line"></div></div>'
+    +'<div class="grid">'+items.map(makeTile).join('')+'</div>';
+}
+
+function renderDash(){
+  state.view='dash';
+  var daily=[
+    {k:'siegelgeraet',i:'🔐',t:'Siegelgerät',s:'Seal Check | SN GDH201720'},
+    {k:'raumtemperatur',i:'🌡️',t:'Raumtemperatur',s:'Apotheke / OP 2'},
+    {k:'sterilisator',i:'⚗️',t:'SteriEuronda E10',s:'Zykluskontrolle | EXM240031'},
+    {k:'reinigung',i:'🧹',t:'Reinigung Fussboden',s:'Gesamte Praxis'}
+  ];
+  var weekly=[
+    {k:'pflegegeraet',i:'🦷',t:'Pflegegerät Assistina',s:'W&H Assistina | SN07159'},
+    {k:'reinigung_sterilisator',i:'🔧',t:'Reinigungs-Sterilisator Lisa',s:'Wöchentlich | SN13001'},
+    {k:'melatherm',i:'💧',t:'Reinigung MELAtherm',s:'SN 202110-DTA1067'},
+    {k:'ablaufdaten',i:'📦',t:'Ablaufdaten & Sauberkeit',s:'4-Bereiche Kontrolle'},
+    {k:'datensicherung',i:'💾',t:'Datensicherung',s:'Wöchentlich'}
+  ];
+  var quarterly=[
+    {k:'buerste',i:'🧤',t:'Austausch Bürste/Handschuhe',s:'Alle 3 Monate'},
+    {k:'sympronadeln',i:'💉',t:'Sympronadeln austauschen',s:'Alle 3 Monate'}
+  ];
+  var bedarf=[
+    {k:'kanister',i:'🗂️',t:'Rückverfolgbarkeit Kanister',s:'Bei Bedarf'},
+    {k:'ultraschall',i:'🔊',t:'Fehlerhafte Waschgänge MELAtherm',s:'Bei Bedarf | SN 2021016821'}
+  ];
+  document.getElementById('app').innerHTML=
+    '<div class="hdr"><div><div class="hdr-title">zahnarztKORN</div>'
+    +'<div class="hdr-sub">Protokollführung · '+fmtD(today())+'</div></div>'
+    +'<button class="hdr-btn" onclick="goArchive()">Archiv ('+state.entries.length+')</button></div>'
+    +'<div class="pad">'
+    +makeSec('Täglich',G,daily)
+    +makeSec('Wöchentlich',BR,weekly)
+    +makeSec('Alle 3 Monate',PU,quarterly)
+    +makeSec('Bei Bedarf',OR,bedarf)
+    +'<p style="text-align:center;margin-top:24px;font-size:10px;color:#ccc">zahnarztKORN Protokollführung</p>'
+    +'</div>';
+}
+
+// ── Form ──────────────────────────────────────────────────────────────────────
+function sfd(k,v){ state.fd[k]=v; }
+function tpill(k,v){ state.fd[k]=(state.fd[k]===v?null:v); render(); }
+function tfd(k){ state.fd[k]=!state.fd[k]; render(); }
+
+function openForm(t){
+  var sni=SN[t];
+  state.form=t; state.fd={date:today(),time:nowTime()};
+  if(sni) state.fd.geraet_sn=sni.name+' | '+sni.sn;
+  state.sig=null; render();
+}
+function closeForm(){ state.form=null; render(); }
+function goArchive(){ state.view='archive'; state.sel={}; render(); }
+function goDash(){ state.view='dash'; render(); }
+function setFilter(v){ state.archFilter=v; state.sel={}; render(); }
+function closePrint(){ state.printEntries=null; render(); }
+function viewEntry(id){ var e=state.entries.find(function(x){return x.id===id;}); if(e){state.printEntries=[e]; render();} }
+function viewAll(){ state.printEntries=getFiltered(); render(); }
+function viewSel(){ var s=state.entries.filter(function(e){return state.sel[e.id];}); if(s.length>0){state.printEntries=s; render();} }
+function toggleSel(id){ state.sel[id]=!state.sel[id]; render(); }
+function selAll(){ getFiltered().forEach(function(e){state.sel[e.id]=true;}); render(); }
+function selNone(){ state.sel={}; render(); }
+function delEntry(id){ if(!confirm('Protokoll löschen?'))return; state.entries=state.entries.filter(function(e){return e.id!==id;}); delete state.sel[id]; saveData(); render(); }
+function delSel(){ var ids=Object.keys(state.sel).filter(function(k){return state.sel[k];}); if(!ids.length)return; if(!confirm(ids.length+' Protokolle löschen?'))return; state.entries=state.entries.filter(function(e){return ids.indexOf(String(e.id))<0;}); state.sel={}; saveData(); render(); }
+function deleteAll(){ var f=getFiltered(); if(!f.length)return; if(!confirm('Alle '+f.length+' löschen?'))return; var ids=f.map(function(e){return e.id;}); state.entries=state.entries.filter(function(e){return ids.indexOf(e.id)<0;}); state.sel={}; saveData(); render(); }
+
+function renderForm(){
+  var t=state.form, fd=state.fd, col=TC[t]||G;
+  var sni=SN[t];
+  var snBar=sni?'<div class="sn-bar">'+sni.name+' | '+sni.sn+'</div>':'';
+  var DT='<div class="g2"><div><div class="lbl">Datum</div><input class="fi" type="date" value="'+(fd.date||'')+'" oninput="sfd(\'date\',this.value)"></div>'
+    +'<div><div class="lbl">Uhrzeit</div><input class="fi" type="time" value="'+(fd.time||'')+'" oninput="sfd(\'time\',this.value)"></div></div>';
+
+  function inp(k,tp,ph){ return '<input class="fi" type="'+(tp||'text')+'" value="'+(fd[k]||'')+'" placeholder="'+(ph||'')+'" oninput="sfd(\''+k+'\',this.value)">'; }
+  function sel(k,opts){ return '<select class="fi" onchange="sfd(\''+k+'\',this.value)">'+opts.map(function(o){return'<option value="'+o+'"'+(fd[k]===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select>'; }
+  function pills(k,opts){ return '<div class="pills">'+opts.map(function(o){return'<div class="pill'+(fd[k]===o?' on':'')+'" onclick="tpill(\''+k+'\',\''+o+'\')">'+o+'</div>';}).join('')+'</div>'; }
+  function chk(k,lb){ var on=!!fd[k]; return '<div class="cbr" onclick="tfd(\''+k+'\')"><div class="cbb'+(on?' on':'')+'">'+( on?'<svg width="11" height="11" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>':'')+' </div><span style="font-size:13px;color:#1a1a1a;line-height:1.3">'+lb+'</span></div>'; }
+  function txta(k,ph){ return '<textarea class="fi" placeholder="'+(ph||'')+'" oninput="sfd(\''+k+'\',this.value)">'+(fd[k]||'')+'</textarea>'; }
+  function cw(inner){ return '<div class="chk-wrap">'+inner+'</div>'; }
+  function camBtn(){ return '<button class="cam-btn" onclick="triggerCam()">📷 Foto aufnehmen</button>'+(fd.foto?'<img src="'+fd.foto+'" style="width:100%;border-radius:8px;border:1px solid #ddd;margin-bottom:8px;display:block"><button onclick="sfd(\'foto\',null);render()" style="font-size:11px;color:#c0392b;background:none;border:none;cursor:pointer;margin-bottom:9px;display:block">✕ Foto entfernen</button>':''); }
+
+  function lernendeBox(){
+    var isOn=!!fd.lernende;
+    var archiv=isOn?'Archiv: SteriEuronda > Freigaben Lernende':'Archiv: SteriEuronda > Standard Freigaben';
+    var cbbCls=isOn?' on':'';
+    var chkSvg=isOn?'<svg width="11" height="11" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>':'';
+    return '<div class="lernende-box" onclick="tfd(\'lernende\')">'
+      +'<div class="cbb'+cbbCls+'" style="border-color:'+(isOn?'#f0c040':'#ccc')+';background:'+(isOn?'#f0c040':'#fff')+'">'+chkSvg+'</div>'
+      +'<div><div style="font-size:13px;color:#1a1a1a;font-weight:600">Freigabe durch Lernende</div>'
+      +'<div style="font-size:10px;color:#b7860b;margin-top:2px">'+archiv+'</div></div></div>';
+  }
+
+  var body='';
+  if(t==='siegelgeraet') body=DT+snBar+'<div class="lbl">Seal Check Status</div>'+pills('status',['OK','Nicht OK'])+(fd.status==='Nicht OK'?'<div class="lbl">Bemerkung</div>'+txta('bemerkung','Beschreibung...'):'');
+  else if(t==='raumtemperatur') body=DT+'<div class="lbl">Ort</div>'+sel('ort',['Apotheke','OP 2'])+'<div class="g2"><div><div class="lbl">Ist °C</div>'+inp('ist','number','21.5')+'</div><div><div class="lbl">Min °C</div>'+inp('min','number')+'</div></div><div style="max-width:50%"><div class="lbl">Max °C</div>'+inp('max','number')+'</div>';
+  else if(t==='sterilisator') body=DT+snBar+'<div class="lbl">Programm</div>'+pills('art',['134B Prion','Schnellprogramm S134','Helix Vakuum'])+'<div class="lbl">Status</div>'+pills('status',['Erfolgreich','Fehlgeschlagen','Abgebrochen'])+(fd.status==='Fehlgeschlagen'?'<div class="warn-box"><div class="lbl">Warum</div>'+txta('warum','Grund...')+'<div class="lbl">Massnahme</div>'+txta('massnahme','Massnahme...')+'</div>':'')+'<div class="lbl">Foto Protokollstreifen</div>'+camBtn()+lernendeBox();
+  else if(t==='reinigung') body=DT+cw(chk('erledigt','Reinigung & Desinfektion Fussboden gesamte Praxis erledigt'));
+  else if(t==='pflegegeraet') body=DT+snBar+cw(chk('done','Reinigung Assistina durchgeführt'))+'<div class="lbl">Bemerkungen</div>'+txta('bemerkung','Besonderheiten...');
+  else if(t==='reinigung_sterilisator') body=DT+snBar+cw(chk('done','Reinigung Sterilisator Lisa durchgeführt'))+'<div class="lbl">Bemerkungen</div>'+txta('bemerkung','Besonderheiten...');
+  else if(t==='melatherm') body=DT+snBar+cw(chk('done','Reinigung MELAtherm durchgeführt'))+'<div class="lbl">Bemerkungen</div>'+txta('bemerkung','Besonderheiten...');
+  else if(t==='ablaufdaten') body=DT+cw(chk('lager','Lager – Ablaufdaten geprüft & sauber')+chk('apotheke','Apotheke – Ablaufdaten geprüft & sauber')+chk('notfall','Notfallkoffer – Ablaufdaten geprüft & sauber')+chk('instrumente','Instrumente – Ablaufdaten geprüft & sauber'));
+  else if(t==='datensicherung') body=DT+cw(chk('done','Datensicherung durchgeführt'));
+  else if(t==='buerste') body=DT+cw(chk('done','Austausch Bürste/Handschuhe durchgeführt'));
+  else if(t==='sympronadeln') body=DT+cw(chk('done','Sympronadeln ausgetauscht'));
+  else if(t==='kanister') body=DT+'<div class="lbl">Produktname</div>'+inp('produkt','text','Produktname')+'<div class="lbl">Foto Lotnummer</div>'+camBtn()+'<div class="g2"><div><div class="lbl">Verfallsdatum</div>'+inp('verfall','date')+'</div><div><div class="lbl">Öffnungsdatum</div>'+inp('oeffnung','date')+'</div></div>';
+  else if(t==='ultraschall') body=DT+snBar+'<div class="lbl">Programm</div>'+pills('programm',['Universal','Anderes'])+(fd.programm==='Anderes'?'<div class="lbl">Programm (frei)</div>'+inp('programm_frei','text','Programmname'):'')+cw(chk('josafe','Josafe nicht gewaschen')+chk('instrumente','Instrumente nicht gewaschen')+chk('fehler','Fehlermeldung / Störung')+chk('techniker','Techniker kontaktiert'));
+
+  var btnCls=col===BR?' br':col===PU?' pu':col===OR?' or':'';
+  document.getElementById('app').innerHTML=
+    '<div style="background:'+col+';padding:13px 16px;display:flex;justify-content:space-between;align-items:center">'
+    +'<span style="color:#fff;font-size:15px;font-weight:600">'+(TL[t]||t)+'</span>'
+    +'<button onclick="closeForm()" style="background:none;border:none;font-size:20px;cursor:pointer;color:rgba(255,255,255,.8);padding:0 4px">✕</button></div>'
+    +'<div style="padding:15px">'+body
+    +'<div style="margin-top:13px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+    +'<div class="lbl" style="margin:0">Unterschrift</div>'
+    +'<button onclick="clearSig()" style="font-size:11px;color:#c0392b;background:none;border:none;cursor:pointer">✕ Löschen</button></div>'
+    +'<canvas id="sig-canvas" width="600" height="90"></canvas>'
+    +'<p style="font-size:10px;color:#aaa;margin-top:3px">Mit Finger unterschreiben</p></div>'
+    +'<button class="save-btn'+btnCls+'" id="save-btn" onclick="doSave()">Speichern & Protokoll anzeigen</button>'
+    +'</div>';
+  initSig();
+}
+
+// ── Print ─────────────────────────────────────────────────────────────────────
+function renderPrint(){
+  var entries=state.printEntries;
+  var fname=entries.length===1?makeFilename(entries[0]):today()+'_Protokolle_'+entries.length;
+  function entryBlock(e){
+    var sni=SN[e.type];
+    var rows=Object.entries(e.data||{}).filter(function(kv){return kv[0]!=='foto';}).map(function(kv){
+      var v=typeof kv[1]==='boolean'?(kv[1]?'Ja':'Nein'):(kv[1]||'—');
+      return '<tr><td style="padding:5px 8px;border-bottom:1px solid #eee;color:#666;font-size:12px;width:45%">'+(KM[kv[0]]||kv[0])+'</td><td style="padding:5px 8px;border-bottom:1px solid #eee;font-size:12px;font-weight:500">'+v+'</td></tr>';
+    }).join('');
+    var foto=e.data&&e.data.foto?'<div style="margin-top:9px"><p style="font-size:10px;color:#888;margin-bottom:4px">Foto:</p><img src="'+e.data.foto+'" style="max-width:100%;max-height:180px;object-fit:contain;border-radius:6px;border:1px solid #ddd"></div>':'';
+    var sig=e.sig?'<div style="margin-top:9px;padding-top:9px;border-top:1px solid #eee"><p style="font-size:10px;color:#888;margin-bottom:3px">Unterschrift:</p><img src="'+e.sig+'" style="height:50px;border-radius:4px;border:1px solid #ddd"></div>':'';
+    var lernTag=e.type==='sterilisator'?(e.data&&e.data.lernende?' <span style="background:#f0c040;color:#7a6000;border-radius:3px;padding:1px 5px;font-size:9px">LERNENDE</span>':' <span style="background:#e8f0eb;color:#2D5A3D;border-radius:3px;padding:1px 5px;font-size:9px">STANDARD</span>'):'';
+    return '<div style="page-break-inside:avoid;border:1.5px solid #ddd;border-radius:9px;padding:13px 15px;margin-bottom:13px;background:#fff">'
+      +(entries.length>1?'<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:'+(TC[e.type]||G)+';margin-bottom:1px">'+(TL[e.type]||e.type)+lernTag+'</div>':'')
+      +(sni?'<div style="font-size:9px;color:#aaa;font-family:monospace;margin-bottom:6px">'+sni.name+' | '+sni.sn+'</div>':'')
+      +'<div style="font-size:9px;color:#ccc;font-family:monospace;margin-bottom:7px">'+makeFilename(e)+'</div>'
+      +'<table style="width:100%;border-collapse:collapse">'+rows+'</table>'+foto+sig+'</div>';
+  }
+  document.getElementById('app').innerHTML=
+    '<div class="prt-hdr"><span>'+fname+'</span>'
+    +'<button class="prt-btn" style="background:#fff;color:#2D5A3D" onclick="window.print()">Drucken / PDF</button>'
+    +'<button class="prt-btn" style="background:rgba(255,255,255,.2);color:#fff;margin-left:4px" onclick="closePrint()">✕ Zurück</button></div>'
+    +'<div style="padding:20px 16px;max-width:640px;margin:0 auto;font-family:Georgia,serif">'
+    +'<h1 style="font-size:18px;margin-bottom:3px">zahnarztKORN</h1>'
+    +'<h2 style="font-size:12px;color:#666;font-weight:normal;margin-bottom:5px;font-family:system-ui">'
+    +(entries.length===1?(TL[entries[0].type]+' · '+fmtD(entries[0].data&&entries[0].data.date)+' · '+(entries[0].data&&entries[0].data.time||'')):(entries.length+' Protokolle · '+fmtD(today())))
+    +'</h2>'
+    +'<div style="font-size:9px;color:#bbb;font-family:monospace;margin-bottom:5px">'+fname+'.pdf</div>'
+    +'<p style="font-size:10px;color:#aaa;font-family:system-ui;margin-bottom:16px">Teilen → Drucken → zwei Finger auseinanderziehen → PDF → Proton Drive</p>'
+    +entries.map(entryBlock).join('')+'</div>';
+}
+
+// ── Archive ───────────────────────────────────────────────────────────────────
+function renderArchive(){
+  var filtered=getFiltered();
+  var nSel=Object.values(state.sel).filter(Boolean).length;
+  var allChk=filtered.length>0&&filtered.every(function(e){return state.sel[e.id];});
+  var months={};
+  filtered.forEach(function(e){var m=(e.data&&e.data.date||'').slice(0,7)||'—'; months[m]=(months[m]||0)+1;});
+  var mInfo=Object.keys(months).sort().reverse().map(function(m){var p=m.split('-');return(p[1]&&p[0]?p[1]+'.'+p[0]:m)+': '+months[m];}).join('  ·  ');
+  var opts='<option value="all">Alle Protokolle</option>'
+    +Object.keys(TL).map(function(k){return'<option value="'+k+'"'+(state.archFilter===k?' selected':'')+'>'+TL[k]+'</option>';}).join('')
+    +'<option value="sterilisator_standard"'+(state.archFilter==='sterilisator_standard'?' selected':'')+'>SteriEuronda – Standard Freigaben</option>'
+    +'<option value="sterilisator_lernende"'+(state.archFilter==='sterilisator_lernende'?' selected':'')+'>SteriEuronda – Freigaben Lernende</option>';
+  var rows=filtered.length===0?'<div class="empty">Noch keine Einträge.</div>':filtered.map(function(e){
+    var bc=TC[e.type]||G; var isSel=!!state.sel[e.id];
+    var lernTag=e.type==='sterilisator'?(e.data&&e.data.lernende?' <span style="background:#f0c040;color:#7a6000;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700">LERNENDE</span>':' <span style="background:#e8f0eb;color:#2D5A3D;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700">STANDARD</span>'):'';
+    return '<div class="arc-row" style="border-color:'+bc+';'+(isSel?'background:#e8f0eb;':'')+'">'
+      +'<div onclick="toggleSel('+e.id+')" style="width:24px;height:24px;border-radius:6px;border:2px solid '+(isSel?bc:'#ccc')+';background:'+(isSel?bc:'#fff')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer">'
+      +(isSel?'<svg width="11" height="11" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>':'')+'</div>'
+      +(e.sig?'<img src="'+e.sig+'" style="height:42px;width:68px;object-fit:contain;border-radius:5px;border:1px solid #ddd;flex-shrink:0">':'')
+      +'<div style="flex:1;min-width:0;overflow:hidden">'
+      +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:'+bc+'">'+(TL[e.type]||e.type)+lernTag+'</div>'
+      +'<div style="font-size:11px;color:#888;margin-top:1px">'+fmtD(e.data&&e.data.date)+' · '+(e.data&&e.data.time||'')+'</div>'
+      +'<div style="font-size:9px;color:#ccc;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+makeFilename(e)+'</div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">'
+      +'<button onclick="viewEntry('+e.id+')" style="padding:4px 9px;background:'+bc+';color:#fff;border:none;border-radius:5px;font-size:11px;cursor:pointer">PDF</button>'
+      +'<button onclick="delEntry('+e.id+')" style="padding:4px 7px;color:#c0392b;border:1px solid #c0392b;background:none;border-radius:5px;font-size:11px;cursor:pointer">Löschen</button>'
+      +'</div></div>';
+  }).join('');
+
+  document.getElementById('app').innerHTML=
+    '<div class="hdr"><div><div class="hdr-title">zahnarztKORN</div><div class="hdr-sub">Protokollführung · '+fmtD(today())+'</div></div>'
+    +'<button class="hdr-btn" onclick="goDash()">← Dashboard</button></div>'
+    +'<div class="pad">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><span style="font-size:15px;font-weight:600">Archiv ('+state.entries.length+')</span></div>'
+    +(mInfo?'<div style="font-size:11px;color:#888;margin-bottom:9px;padding:7px 11px;background:#fff;border-radius:7px;border:1px solid #eee">'+mInfo+'</div>':'')
+    +'<div style="margin-bottom:9px"><div class="lbl">Filter nach Typ</div><select class="fi" style="margin-bottom:0" onchange="setFilter(this.value)">'+opts+'</select></div>'
+    +(filtered.length>0?
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">'
+      +'<button onclick="viewAll()" style="padding:9px;background:#555;color:#fff;border:none;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">Alle ansehen</button>'
+      +'<button onclick="deleteAll()" style="padding:9px;background:#fff;color:#c0392b;border:1px solid #c0392b;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">Alle löschen</button>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px">'
+      +'<button onclick="'+(allChk?'selNone()':'selAll()')+'\" style="padding:9px;background:#f0ede8;color:#555;border:1px solid #ddd;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer">'+(allChk?'Alle abwählen':'Alle auswählen')+'</button>'
+      +'<button onclick="viewSel()" '+(nSel===0?'disabled':'')+' style="padding:9px;background:'+(nSel>0?G:'#ccc')+';color:#fff;border:none;border-radius:9px;font-size:11px;font-weight:600;cursor:'+(nSel>0?'pointer':'default')+'">Auswahl PDF'+(nSel>0?' ('+nSel+')':'')+'</button>'
+      +'</div>':'')
+    +(nSel>0?'<div class="sel-bar"><span style="font-size:12px;font-weight:600">'+nSel+' ausgewählt</span><button onclick="delSel()" style="padding:5px 11px;background:#c0392b;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Löschen</button></div>':'')
+    +rows+'</div>';
+}
+
+// ── Save & Sig ────────────────────────────────────────────────────────────────
+function doSave(){
+  var btn=document.getElementById('save-btn');
+  if(btn){btn.disabled=true;btn.textContent='Wird gespeichert...';}
+  var entry={id:Date.now(),type:state.form,data:Object.assign({},state.fd),sig:state.sig,at:new Date().toISOString()};
+  state.entries.unshift(entry); saveData();
+  state.form=null; state.printEntries=[entry]; render();
+}
+function initSig(){
+  sigCanvas=document.getElementById('sig-canvas'); if(!sigCanvas)return;
+  sigCtx=sigCanvas.getContext('2d'); drawing=false;
+  function getP(e,c){var r=c.getBoundingClientRect(),sx=c.width/r.width,sy=c.height/r.height,s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*sx,y:(s.clientY-r.top)*sy};}
+  sigCanvas.onmousedown=function(e){drawing=true;var p=getP(e,sigCanvas);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);};
+  sigCanvas.onmousemove=function(e){if(!drawing)return;sigCtx.lineWidth=2;sigCtx.lineCap='round';sigCtx.strokeStyle='#1a1a1a';var p=getP(e,sigCanvas);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();};
+  sigCanvas.onmouseup=sigCanvas.onmouseleave=function(){drawing=false;if(sigCanvas)state.sig=sigCanvas.toDataURL();};
+  sigCanvas.ontouchstart=function(e){e.preventDefault();drawing=true;var p=getP(e,sigCanvas);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);};
+  sigCanvas.ontouchmove=function(e){e.preventDefault();if(!drawing)return;sigCtx.lineWidth=2;sigCtx.lineCap='round';sigCtx.strokeStyle='#1a1a1a';var p=getP(e,sigCanvas);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();};
+  sigCanvas.ontouchend=function(){drawing=false;if(sigCanvas)state.sig=sigCanvas.toDataURL();};
+}
+function clearSig(){if(sigCtx&&sigCanvas)sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height);state.sig=null;}
+function triggerCam(){
+  var input=document.getElementById('cam-input');
+  input.onchange=function(e){var file=e.target.files[0];if(!file)return;var r=new FileReader();r.onload=function(ev){state.fd.foto=ev.target.result;render();};r.readAsDataURL(file);input.value='';};
+  input.click();
+}
+
+loadData();
+</script>
+</body>
+</html>
